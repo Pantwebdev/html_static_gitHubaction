@@ -1,4 +1,4 @@
-FROM local-nginx:alpine
+FROM nginx:alpine
 
 COPY . /usr/share/nginx/html
 
