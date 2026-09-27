@@ -1,0 +1,34 @@
+version: 0.2
+
+# Values to change before deployment:
+#   AWS_DEFAULT_REGION - e.g. ap-south-1 (or set it as a CodeBuild variable)
+#   IMAGE_REPO_NAME - replace the dummy name below with your ECR repository name
+# Optional:
+#   IMAGE_TAG       - defaults to the CodeBuild source revision
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      - AWS_ACCOUNT_ID=707604458390
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-ap-south-1}
+      - IMAGE_REPO_NAME=${IMAGE_REPO_NAME:-replace-with-your-ecr-repository-name}
+      - IMAGE_TAG=${IMAGE_TAG:-${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}}
+      - IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}
+      - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$IMAGE_URI"
+  build:
+    commands:
+      - echo "Building Docker image..."
+      - docker build --tag "$IMAGE_REPO_NAME:$IMAGE_TAG" .
+      - docker tag "$IMAGE_REPO_NAME:$IMAGE_TAG" "$IMAGE_URI:$IMAGE_TAG"
+      - docker tag "$IMAGE_REPO_NAME:$IMAGE_TAG" "$IMAGE_URI:latest"
+  post_build:
+    commands:
+      - echo "Pushing Docker image..."
+      - docker push "$IMAGE_URI:$IMAGE_TAG"
+      - docker push "$IMAGE_URI:latest"
+      - printf '[{"name":"medical-static","imageUri":"%s"}]' "$IMAGE_URI:$IMAGE_TAG" > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
