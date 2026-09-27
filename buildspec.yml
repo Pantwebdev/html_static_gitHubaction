@@ -27,7 +27,7 @@ phases:
       - echo "Pushing Docker image..."
       - docker push "$IMAGE_URI:$IMAGE_TAG"
       - docker push "$IMAGE_URI:latest"
-      - printf '[{"name":"medical-static","imageUri":"%s"}]' "$IMAGE_URI:$IMAGE_TAG" > imagedefinitions.json
+      - printf '[{"name":"website","imageUri":"%s"}]' "$IMAGE_URI:$IMAGE_TAG" > imagedefinitions.json
 
 artifacts:
   files:
