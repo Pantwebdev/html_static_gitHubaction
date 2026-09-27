@@ -2,7 +2,7 @@ version: 0.2
 
 # Values to change before deployment:
 #   AWS_DEFAULT_REGION - e.g. ap-south-1 (or set it as a CodeBuild variable)
-#   IMAGE_REPO_NAME - replace the dummy name below with your ECR repository name
+#   IMAGE_REPO_NAME - defaults to the htmlstatic ECR repository
 # Optional:
 #   IMAGE_TAG       - defaults to the CodeBuild source revision
 
@@ -12,7 +12,7 @@ phases:
       - echo "Logging in to Amazon ECR..."
       - AWS_ACCOUNT_ID=707604458390
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-ap-south-1}
-      - IMAGE_REPO_NAME=${IMAGE_REPO_NAME:-replace-with-your-ecr-repository-name}
+      - IMAGE_REPO_NAME=${IMAGE_REPO_NAME:-htmlstatic}
       - IMAGE_TAG=${IMAGE_TAG:-${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}}
       - IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}
       - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$IMAGE_URI"
